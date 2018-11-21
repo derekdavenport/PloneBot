@@ -60,6 +60,12 @@ namespace PloneBot
 			{
 				Console.WriteLine(response.StatusDescription);
 			}
+
+			Folder rootFolder = new Folder(siteUri);
+			Page home = new Page("home", rootFolder);
+			home.GetPortlets();
+
+			rootFolder.SetupPortletsFolder();
 		}
 
 		private void IMAPButton_Click(object sender, RoutedEventArgs e)

@@ -96,6 +96,7 @@ namespace PloneBot
 		{
 			//var body = message.BodyParts.OfType<TextPart>().FirstOrDefault().ToString();
 			Console.WriteLine("Do work on {0}", uid);
+			// track all jobs and don't reconnect until all are finished?
 			Task task = Task.Factory.StartNew(() => { PloneUtils.HandleMessage(body); });
 			task.ContinueWith(e => { JobFinished(uid, e); });
 		}
@@ -115,6 +116,8 @@ namespace PloneBot
 					await ploneBotFolder.SetFlagsAsync(new List<UniqueId> { uid }, MessageFlags.Seen, true);//, done.Token);
 					
 					Console.WriteLine("Finished {0}", uid);
+					// TODO: waitall/join
+					// find a way to not resume until all set seen jobs are done
 					resumeIdle.Set();
 					break;
 				case TaskStatus.Faulted:
@@ -243,6 +246,10 @@ namespace PloneBot
 							// The IMAP server responded with "NO" or "BAD" to either the IDLE command or the NOOP command.
 							// This should never happen... but again, we're catching it for the sake of completeness.
 							break;
+						}
+						catch (System.IO.IOException)
+						{
+							// TODO: reconnect
 						}
 						finally
 						{
